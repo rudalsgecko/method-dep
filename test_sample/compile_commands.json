@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "D:/proj/method-dep/test_sample",
+    "command": "g++ -std=c++17 -Iinclude -c src/calculator.cpp -o build/calculator.o",
+    "file": "src/calculator.cpp"
+  }
+]

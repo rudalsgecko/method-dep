@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# method-dep runtime output
+method-dep.yaml
+.method-dep/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# OMC
+.omc/
+
+# Test sample output
+test_sample/.method-dep/

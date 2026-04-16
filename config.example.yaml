@@ -1,0 +1,56 @@
+# method-dep configuration
+# Copy to method-dep.yaml and adjust for your project
+
+# Target C++ project root (absolute or relative path)
+project_path: "D:/proj/your-cpp-project"
+
+# compile_commands.json location (relative to project_path)
+compile_commands: "compile_commands.json"
+
+# Source file extensions to scan
+source_extensions:
+  - ".cpp"
+  - ".cc"
+  - ".cxx"
+
+header_extensions:
+  - ".h"
+  - ".hpp"
+
+# Glob patterns to exclude (relative to project_path)
+exclude_patterns:
+  - "test/*"
+  - "tests/*"
+  - "third_party/*"
+  - "build/*"
+  - "external/*"
+  - "vendor/*"
+
+# Output directory (relative to project_path)
+output_dir: ".method-dep"
+context_dir: "context"
+tests_dir: "generated_tests"
+
+# Test framework: gtest
+test_framework: "gtest"
+
+# Custom build command (optional, uses compile_commands.json flags if empty)
+# Placeholders: {test_file}, {output}, {project_root}, {build_dir}
+test_build_command: ""
+
+# CMake build directory (relative to project_path)
+cmake_build_dir: "build"
+
+# LLM tool: "claude" or "opencode"
+llm_tool: "claude"
+claude_command: "claude"
+opencode_command: "opencode"
+max_attempts: 3
+
+# Coverage
+coverage_tool: "OpenCppCoverage"
+coverage_threshold: 60.0
+opencppcoverage_path: "OpenCppCoverage"
+
+# Behavior
+skip_external_deps: true
