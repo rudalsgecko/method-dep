@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "methoddep"
+version = "0.1.0"
+description = "Per-method C++/MSVC intel gatherer for unit test scaffolding"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "method-dep2" }]
+
+dependencies = [
+    "click>=8.1,<9",
+    "pydantic>=2.7,<3",
+    "rich>=13,<14",
+    "libclang>=18.1.1,<20",
+    "tree-sitter>=0.23,<0.26",          # py3.13 wheel availability
+    "tree-sitter-cpp>=0.23,<0.24",
+    "lizard>=1.17,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "pytest-cov>=5,<6",
+]
+
+[project.scripts]
+methoddep = "methoddep.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["methoddep*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra --strict-markers"
+python_classes = ["Test*Case", "_Test*"]   # avoid collecting pydantic models named "TestConfig" etc.
+
+[tool.coverage.run]
+source = ["src/methoddep"]
+branch = true

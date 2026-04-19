@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+build/
+dist/
+*.egg
+pip-wheel-metadata/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# methoddep / ralph runtime artifacts
+artifacts/
+out/
+.methoddep/
+.ralph-state.json
+
+# OMC state (session-local)
+.omc/state/
+.omc/logs/
+.omc/research/
+.omc/artifacts/
