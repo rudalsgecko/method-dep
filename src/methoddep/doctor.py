@@ -137,13 +137,15 @@ def check_lizard() -> CheckResult:
 
 
 def check_tree_sitter() -> CheckResult:
+    # Must match how treesitter_index.py actually loads the grammar:
+    #   tree_sitter.Language(tree_sitter_cpp.language())
     try:
-        import tree_sitter  # type: ignore[import-not-found]
-        import tree_sitter_languages  # type: ignore[import-not-found]
+        from tree_sitter import Language  # type: ignore[import-not-found]
+        import tree_sitter_cpp as _ts_cpp  # type: ignore[import-not-found]
     except ImportError as exc:
         return CheckResult("tree-sitter", False, f"import failed: {exc}")
     try:
-        lang = tree_sitter_languages.get_language("cpp")
+        lang = Language(_ts_cpp.language())
     except Exception as exc:
         return CheckResult("tree-sitter", False, f"cpp grammar unavailable: {exc}")
     return CheckResult("tree-sitter", bool(lang), "cpp grammar loaded")
