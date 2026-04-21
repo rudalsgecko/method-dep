@@ -1,18 +1,22 @@
 """ctags-based symbol index (L3).
 
 Uses Universal Ctags with JSON output (`--output-format=json`) when the
-binary is available. When ctags is absent or returns an error, the
-module returns an empty index — callers treat it as optional
-cross-validation data.
+binary is available. ctags is resolved via
+`methoddep._bundled.ctags.resolve_ctags`, which prefers a system-PATH
+install but falls back to the bundled binary shipped inside the wheel
+(`_bundled/ctags/<platform>/`). When no ctags is available, the module
+returns an empty index — callers treat it as optional cross-validation
+data.
 """
 
 from __future__ import annotations
 
 import json
-import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+
+from methoddep._bundled.ctags import resolve_ctags
 
 
 @dataclass(frozen=True)
@@ -26,7 +30,7 @@ class CtagEntry:
 
 
 def ctags_available() -> bool:
-    exe = shutil.which("ctags")
+    exe = resolve_ctags()
     if not exe:
         return False
     try:
@@ -45,10 +49,9 @@ def ctags_available() -> bool:
 
 
 def index_tree(root: Path) -> list[CtagEntry]:
-    if not ctags_available():
+    exe = resolve_ctags()
+    if not exe or not ctags_available():
         return []
-    exe = shutil.which("ctags")
-    assert exe is not None
     try:
         proc = subprocess.run(
             [

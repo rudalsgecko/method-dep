@@ -7,7 +7,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .tox/
-build/
+# Root-anchored: don't accidentally swallow `src/methoddep/build/`,
+# which is the L0 build-intel sub-package.
+/build/
 dist/
 *.egg
 pip-wheel-metadata/
@@ -33,6 +35,11 @@ artifacts/
 out/
 .methoddep/
 .ralph-state.json
+
+# binlog2xml shim build output (only present if someone builds in place
+# instead of the user-cache copy; normally empty)
+src/methoddep/_shim/**/bin/
+src/methoddep/_shim/**/obj/
 
 # OMC state (session-local)
 .omc/state/

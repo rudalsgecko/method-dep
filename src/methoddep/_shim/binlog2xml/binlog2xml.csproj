@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    methoddep binlog→XML shim.
+
+    Thin wrapper around MSBuild.StructuredLogger so the Python pipeline
+    can convert an existing `.binlog` into the XML form that
+    `binlog_parser.py` understands. The library has all the machinery
+    (XmlLogWriter.WriteToXml); it just lacks a CLI entry point, so we
+    provide one here.
+
+    Built on-demand from methoddep at first use (`dotnet build -c Release`),
+    cached under the user's home.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>binlog2xml</AssemblyName>
+    <RootNamespace>Methoddep.Binlog2Xml</RootNamespace>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MSBuild.StructuredLogger" Version="2.3.113" />
+  </ItemGroup>
+</Project>

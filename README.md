@@ -18,8 +18,11 @@ methoddep doctor              # 외부 툴 체크
 | **LLVM libclang** | ✅ | `choco install llvm` 또는 pip `libclang` (번들) |
 | **lizard** | ✅ | pip (자동) |
 | **tree-sitter + tree-sitter-cpp** | ✅ | pip (자동) |
-| **Universal Ctags** | ⚪ | `choco install universal-ctags` — 위치 교차검증용 |
-| **MSBuild** | ⚪ | VS Build Tools — binlog 경로 쓸 때만 |
+| **Universal Ctags** | ⚪ | `choco install universal-ctags`. **offline 배포 대응**: Windows/Linux x64 바이너리를 `src/methoddep/_bundled/ctags/<platform>/` 에 동봉 가능. `scripts/fetch_bundled_ctags.py` 로 자동 채우기 지원 — 동봉 시 타깃 머신에 ctags 설치 불필요 |
+| **MSBuild** | ⚪ | VS Build Tools — `[build_intel]` 경로 쓸 때만 |
+| **.NET 8+ SDK** | ⚪ | [dotnet.microsoft.com](https://dotnet.microsoft.com/download) — binlog→XML 변환 shim 빌드용 (`[build_intel]` 활성화 시 권장) |
+
+> **binlog→XML shim 에 대해.** `[build_intel]` 이 활성화되면 methoddep 은 `.binlog` 에서 풍부한 구조 정보를 뽑기 위해 내부에 동봉된 **~10줄짜리 C# shim** (`src/methoddep/_shim/binlog2xml/`) 을 빌드해서 사용합니다. shim 은 `MSBuild.StructuredLogger` NuGet 라이브러리를 감싼 얇은 CLI 로, **사용자는 NuGet 패키지나 `dotnet tool` 을 따로 설치하지 않습니다** — .NET SDK 만 있으면 shim 이 알아서 첫 실행에 빌드되고 `~/.methoddep/binlog2xml/` 에 캐시됩니다. .NET SDK 가 없으면 `msbuild /fl` 가 만든 diagnostic text log 경로로 자동 폴백 (기능은 살아있되 XML 대비 파싱 범위가 좁음).
 
 ## Workflow — 새 프로젝트에 적용
 
