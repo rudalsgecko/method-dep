@@ -8,7 +8,6 @@ REQUIRED check fails.
 from __future__ import annotations
 
 import os
-import re
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -67,18 +66,28 @@ def check_libclang() -> CheckResult:
 
 
 def check_ctags() -> CheckResult:
-    exe = shutil.which("ctags")
+    from methoddep._bundled.ctags import bundled_path, resolve_ctags
+
+    exe = resolve_ctags()
     if not exe:
-        return CheckResult("ctags", False, "not on PATH (install Universal Ctags)")
+        hint = "not on PATH and no bundled binary; install Universal Ctags"
+        if bundled_path() is None:
+            hint += (
+                " or populate src/methoddep/_bundled/ctags/<platform>/"
+                " (see scripts/fetch_bundled_ctags.py)"
+            )
+        return CheckResult("ctags", False, hint)
     rc, out = _try_run([exe, "--version"])
     if rc != 0:
-        return CheckResult("ctags", False, f"exit {rc}")
+        return CheckResult("ctags", False, f"exit {rc} from {exe}")
     first = out.splitlines()[0] if out else ""
     ok = "Universal Ctags" in first
+    on_path = shutil.which("ctags") == exe
+    source = "PATH" if on_path else "bundled"
     return CheckResult(
         "ctags",
         ok,
-        first if ok else f"not Universal Ctags: {first!r}",
+        f"{first} [{source}: {exe}]" if ok else f"not Universal Ctags: {first!r}",
     )
 
 
@@ -98,33 +107,52 @@ def check_msbuild() -> CheckResult:
 
 
 def check_dotnet_structured_logger() -> CheckResult:
+    """L0 binlog→XML conversion path.
+
+    methoddep ships its own small C# shim (at `methoddep/_shim/binlog2xml/`)
+    that wraps the `MSBuild.StructuredLogger` library. The only thing
+    the user has to install is the .NET SDK — the NuGet package is
+    pulled in automatically when the shim is built.
+    """
+    from methoddep.build.msbuild_driver import (
+        _shim_cache_root,
+        _shim_source_exists,
+        _built_shim_dll,
+    )
+
+    name = "binlog→XML shim (.NET, bundled)"
     dotnet = shutil.which("dotnet")
     if not dotnet:
         return CheckResult(
-            "StructuredLogger.Cli (dotnet tool)",
+            name,
             False,
-            "dotnet not on PATH",
+            "install .NET SDK 8+ (https://dotnet.microsoft.com/download); "
+            "without it methoddep falls back to diagnostic text-log parsing",
             required=False,
         )
-    rc, out = _try_run([dotnet, "tool", "list", "-g"])
+    if not _shim_source_exists():
+        return CheckResult(
+            name,
+            False,
+            "shim source missing from install — reinstall methoddep "
+            "(expected at methoddep/_shim/binlog2xml/)",
+            required=False,
+        )
+    rc, _ = _try_run([dotnet, "--version"])
     if rc != 0:
         return CheckResult(
-            "StructuredLogger.Cli (dotnet tool)",
+            name,
             False,
-            "dotnet tool list -g failed",
+            "`dotnet --version` failed — check .NET SDK install",
             required=False,
         )
-    ok = bool(re.search(r"msbuild\.structuredlogger\.cli", out, re.IGNORECASE))
-    hint = (
-        "ok" if ok
-        else "install: dotnet tool install -g MSBuild.StructuredLogger.Cli"
+    built = _built_shim_dll(_shim_cache_root() / "src")
+    detail = (
+        f"ready (cached build: {built})"
+        if built.exists()
+        else f"ready (shim will build on first run → {built})"
     )
-    return CheckResult(
-        "StructuredLogger.Cli (dotnet tool)",
-        ok,
-        hint,
-        required=False,
-    )
+    return CheckResult(name, True, detail, required=False)
 
 
 def check_lizard() -> CheckResult:

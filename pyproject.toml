@@ -34,6 +34,20 @@ methoddep = "methoddep.cli:main"
 where = ["src"]
 include = ["methoddep*"]
 
+[tool.setuptools.package-data]
+# Ship the binlog→XML shim (C# source + csproj) inside the wheel so
+# `methoddep doctor` / the build-intel L0 path can build it on demand.
+"methoddep._shim.binlog2xml" = ["*.csproj", "*.cs"]
+# Ship platform-specific Universal Ctags binaries for offline installs.
+# The resolver in `methoddep._bundled.ctags` matches the subdir at runtime.
+"methoddep._bundled.ctags" = [
+    "README.md",
+    "windows-x64/ctags.exe",
+    "windows-x64/.gitkeep",
+    "linux-x64/ctags",
+    "linux-x64/.gitkeep",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

@@ -162,7 +162,8 @@ analyzer_chain = ["msbuild", "libclang", "tree-sitter", "ctags"]
 # 활성화 시 MSBuild binlog에서 include_dirs/defines/PCH를 자동 추출해
 # libclang에 주입. methoddep 자신은 빌드하지 않음 — 아래 커맨드로 먼저 만들 것:
 #    msbuild <your-solution>.sln /bl:artifacts/msbuild.binlog
-# (StructuredLogger.Cli 설치 또는 msbuild /fl 생성한 diagnostic log 둘 다 지원)
+# (binlog → XML 경로엔 .NET SDK 필요. SDK가 없으면 msbuild /fl 로 만든
+#  diagnostic text log 가 자동 폴백.)
 enabled   = true
 mode      = "cached-only"      # cached-only | build-once | always-build
 binlog    = "artifacts/msbuild.binlog"
